@@ -12,7 +12,7 @@ namespace TextGeneration.Lib.Expressions;
 // 1. все буквы только в паттерне.
 // 2. все цифры только в каунте паттерна.
 
-class MultiExpression : IExpression // 2[a]3[b]4[cc] || 2[a3[b]4[c]]
+public class MultiExpression : IExpression // 2[a]3[b]4[cc] || 2[a3[b]4[c]]
 {
     private readonly IExpressionFactory _factory;
     private readonly List<IExpression> _expressions = new();

@@ -4,7 +4,7 @@ using TextGeneration.Lib.Interfaces;
 
 namespace TextGeneration.Lib.Expressions;
 
-class WordExpression : IExpression // ..[asdad]
+public class WordExpression : IExpression // ..[asdad]
 {
     private string _word = string.Empty;
 

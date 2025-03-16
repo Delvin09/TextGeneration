@@ -4,7 +4,7 @@ using TextGeneration.Lib.Interfaces;
 
 namespace TextGeneration.Lib.Expressions;
 
-class NumWordExpression : IExpression // 2[3[b]4[c]]
+public class NumWordExpression : IExpression // 2[3[b]4[c]]
 {
     private readonly IExpressionFactory _factory;
     
@@ -19,7 +19,7 @@ class NumWordExpression : IExpression // 2[3[b]4[c]]
     public static bool IsExpression(ReadOnlySpan<char> span)
     {
         var index = span.IndexOf('['); // 213[ 123[adasd[ ] ]
-        if (!int.TryParse(span[..index], out var number)) return false;
+        if (index <= 0 || !int.TryParse(span[..index], out var number)) return false;
 
         span = span[index..];
         int bc = 1;
