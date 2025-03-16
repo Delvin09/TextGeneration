@@ -1,9 +1,9 @@
 ﻿using System.Text;
 using TextGeneration.Lib;
 
-namespace TextGeneration.Tests;
+namespace TextGeneration.Tests.Integration;
 
-public class UnitTest1
+public class GenerateTextTests
 {
     private string GenerateString(string input)
     {
@@ -18,22 +18,20 @@ public class UnitTest1
     [Theory]
     [InlineData("2[a]", "aa")]
     [InlineData("11[a]", "aaaaaaaaaaa")]
-    public void Test1(string input, string expected)
+    public void Numbers_Test(string input, string expected)
     {
         Assert.Equal(expected, GenerateString(input));
     }
     
     [Fact]
-    // 2[a]3[b]4[cc]             -> aabbbcccccccc
-    public void Test2()
+    public void Multi_Test()
     {
         string input = "2[a]3[b]4[cc]";
         Assert.Equal("aabbbcccccccc", GenerateString(input));
     }
     
     [Fact]
-    // 2[3[b]4[c]]              
-    public void Test3()
+    public void NumberWithMulti_Test()
     {
         string input = "2[3[b]4[c]]";
         Assert.Equal("bbbccccbbbcccc", GenerateString(input));

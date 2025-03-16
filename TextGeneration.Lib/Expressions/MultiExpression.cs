@@ -1,7 +1,8 @@
 ﻿using System.Data;
 using System.Text;
+using TextGeneration.Lib.Interfaces;
 
-namespace TextGeneration.Lib;
+namespace TextGeneration.Lib.Expressions;
 
 // 2[a]             -> aa 
 // 4[a]             -> aaaa
@@ -10,124 +11,6 @@ namespace TextGeneration.Lib;
 
 // 1. все буквы только в паттерне.
 // 2. все цифры только в каунте паттерна.
-
-public interface IExpression
-{
-    void Parse(ReadOnlySpan<char> span);
-    StringBuilder Print(StringBuilder builder);
-}
-
-public interface IExpressionFactory
-{
-    IExpression Create(ReadOnlySpan<char> span);
-}
-
-public class ExpressionFactory : IExpressionFactory
-{
-    public IExpression Create(ReadOnlySpan<char> span)
-    {
-        IExpression result;
-
-        if (WordExpression.IsExpression(span))
-        {
-            result = new WordExpression();
-        }
-        else if (NumWordExpression.IsExpression(span))
-        {
-            result = new NumWordExpression(this);
-        }
-        else if (MultiExpression.IsExpression(span))
-        {
-            result = new MultiExpression(this);
-        }
-        else
-        {
-            throw new InvalidOperationException();
-        }
-        
-        return result;
-    }
-}
-
-class WordExpression : IExpression // ..[asdad]
-{
-    private string _word = string.Empty;
-
-    public static bool IsExpression(ReadOnlySpan<char> span)
-    {
-        if (span[0] != '[' || span[^1] != ']') return false;
-
-        span = span[1..^1];
-        foreach (var letter in span)
-        {
-            if (!char.IsLetter(letter))
-                return false;
-        }
-
-        return true;
-    }
-    
-    public void Parse(ReadOnlySpan<char> span)
-    {
-        if (!IsExpression(span))
-            throw new SyntaxErrorException();
-        
-        _word = span[1..^1].ToString();
-    }
-
-    public StringBuilder Print(StringBuilder builder) => builder.Append(_word);
-}
-
-class NumWordExpression : IExpression // 2[3[b]4[c]]
-{
-    private readonly IExpressionFactory _factory;
-    
-    private int _number = 0;
-    private IExpression? _innerExpression;
-
-    public NumWordExpression(IExpressionFactory factory)
-    {
-        _factory = factory;
-    }
-
-    public static bool IsExpression(ReadOnlySpan<char> span)
-    {
-        var index = span.IndexOf('['); // 213[ 123[adasd[ ] ]
-        if (!int.TryParse(span[..index], out var number)) return false;
-
-        span = span[index..];
-        int bc = 1;
-        for (int i = 1; i < span.Length; i++)
-        {
-            if (bc == 0) return i == span.Length - 1;
-
-            if (span[i] == '[') bc++;
-            else if (span[i] == ']') bc--;
-        }
-        return bc == 0;
-    }
-    
-    public void Parse(ReadOnlySpan<char> span)
-    {
-        if (!IsExpression(span))
-            throw new SyntaxErrorException();
-
-        var index = span.IndexOf('[');
-        _number = int.Parse(span[..index]);
-        
-        span = span[index..];
-        _innerExpression = _factory.Create(span);
-        _innerExpression.Parse(span);
-    }
-
-    public StringBuilder Print(StringBuilder builder)
-    {
-        for (int i = 0; i < _number; i++)
-            _innerExpression.Print(builder);
-        
-        return builder;
-    }
-}
 
 class MultiExpression : IExpression // 2[a]3[b]4[cc] || 2[a3[b]4[c]]
 {
@@ -237,11 +120,4 @@ class MultiExpression : IExpression // 2[a]3[b]4[cc] || 2[a3[b]4[c]]
 
         return builder;
     }
-}
-
-public readonly ref struct ParseResult()
-{
-    public ReadOnlySpan<char> Result { get; init; } = default;
-
-    public ReadOnlySpan<char> Tail { get; init; } = default;
 }

@@ -22,4 +22,8 @@
       <ProjectReference Include="..\TextGeneration.Lib\TextGeneration.Lib.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Unit\" />
+    </ItemGroup>
+
 </Project>
