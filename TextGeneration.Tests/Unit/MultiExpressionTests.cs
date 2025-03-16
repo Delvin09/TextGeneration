@@ -34,6 +34,7 @@ public class MultiExpressionTests
     
     [Theory]
     [InlineData("2[a]3[b]4[cc]")]
+    [InlineData("[2[aaa]]")]
     [InlineData("zz2[a]3[b]4[cc]", Skip = "Not implemented yet")]
     [InlineData("2[a]3[b]4[cc]zz", Skip = "Not implemented yet")]
     [InlineData("2[a]3[b]zz4[cc]zz", Skip = "Not implemented yet")]
@@ -46,11 +47,10 @@ public class MultiExpressionTests
     [Theory]
     [InlineData("[a]")]
     [InlineData("[aaaa]")]
-    [InlineData("[2[aaa]]")]
+    [InlineData("2[aaa]")]
     [InlineData("a2")]
     [InlineData("a")]
     [InlineData("aaaa")]
-    [InlineData("2[aaa]")]
     [InlineData("2[3[b]5[c]]")]
     public void IsNotExpression_Test(string pattern)
     {
@@ -72,7 +72,6 @@ public class MultiExpressionTests
     [Theory]
     [InlineData("[a]")]
     [InlineData("[aaaa]")]
-    [InlineData("[2[aaa]]")]
     [InlineData("a2")]
     [InlineData("a")]
     [InlineData("aaaa")]
@@ -83,17 +82,18 @@ public class MultiExpressionTests
         var actual = new MultiExpression(_factory);
         Assert.Throws<SyntaxErrorException>(() => actual.Parse(pattern));
     }
-    
+
     [Theory]
     [InlineData("2[a]3[b]4[cc]")]
+    [InlineData("[2[aaa]]", "2[aaa]")]
     [InlineData("zz2[a]3[b]4[cc]", Skip = "Not implemented yet")]
     [InlineData("2[a]3[b]4[cc]zz", Skip = "Not implemented yet")]
     [InlineData("2[a]3[b]zz4[cc]zz", Skip = "Not implemented yet")]
-    public void PrintExpression_Success_Test(string pattern)
+    public void PrintExpression_Success_Test(string pattern, string? expected = null)
     {
         var actual = new MultiExpression(_factory);
         actual.Parse(pattern);
-
-        Assert.Equal(pattern, actual.Print(new StringBuilder()).ToString());
+        
+        Assert.Equal(expected ?? pattern, actual.Print(new StringBuilder()).ToString());
     }
 }

@@ -24,6 +24,10 @@ public class MultiExpression : IExpression // 2[a]3[b]4[cc] || 2[a3[b]4[c]]
     
     public static bool IsExpression(ReadOnlySpan<char> span)
     {
+        if (WordExpression.IsExpression(span)
+            || NumWordExpression.IsExpression(span))
+            return false;
+        
         var hasLetters = false;
         var hasNumbers = false;
 
